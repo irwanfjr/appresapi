@@ -2,6 +2,7 @@
 
 var response = require('./res');
 var connection = require('./koneksi');
+const conn = require('./koneksi');
 
 exports.index = function (req, res) {
     response.ok("Aplikasi REST API telah berjalan.", res);
@@ -66,14 +67,27 @@ exports.ubahMahasiswa = function (req, res) {
 }
 
 // MENGHAPUS DATA BERDASARKAN ID NYA
-exports.hapusMahasiswa = function (req,res) {
+exports.hapusMahasiswa = function (req, res) {
     var id = req.body.id_mahasiswa;
     connection.query('DELETE FROM mahasiswa WHERE id_mahasiswa=?', [id],
-    function (error, rows, fields) {
-        if (error) {
-            console.log(error);
-        } else {
-            response.ok("Berhasil hapus data!", res);
-        }
-    })
+        function (error, rows, fields) {
+            if (error) {
+                console.log(error);
+            } else {
+                response.ok("Berhasil hapus data!", res);
+            }
+        })
+}
+
+// MENAMPILKAN MATAKULIAH GROUP
+exports.tampilGroupMatakuliah = function (req, res) {
+    connection.query('SELECT mahasiswa.id_mahasiswa, mahasiswa.nim, mahasiswa.nama, mahasiswa.jurusan, matakuliah.matakuliah, matakuliah.sks FROM krs JOIN matakuliah JOIN mahasiswa WHERE krs.id_matakuliah=matakuliah.id_matakuliah AND krs.id_mahasiswa=mahasiswa.id_mahasiswa ORDER BY mahasiswa.id_mahasiswa',
+        function (error, rows, fields) {
+            if (error) {
+                console.log(error);
+            } else {
+                response.oknested(rows, res);
+            }
+        });
+
 }
